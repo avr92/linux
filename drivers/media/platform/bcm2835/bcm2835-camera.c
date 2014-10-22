@@ -539,7 +539,7 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
 		vchiq_mmal_port_disable(dev->instance,
 					dev->capture.camera_port);
 		if (disable_camera(dev) < 0) {
-			v4l2_err(&dev->v4l2_dev, "Failed to disable camera");
+			v4l2_err(&dev->v4l2_dev, "Failed to disable camera\n");
 			return -EINVAL;
 		}
 		return -1;
@@ -555,7 +555,7 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
 }
 
 /* abort streaming and wait for last buffer */
-static int stop_streaming(struct vb2_queue *vq)
+static void stop_streaming(struct vb2_queue *vq)
 {
 	int ret;
 	struct bm2835_mmal_dev *dev = vb2_get_drv_priv(vq);
@@ -567,8 +567,11 @@ static int stop_streaming(struct vb2_queue *vq)
 	dev->capture.frame_count = 0;
 
 	/* ensure a format has actually been set */
-	if (dev->capture.port == NULL)
-		return -EINVAL;
+	if (dev->capture.port == NULL) {
+		v4l2_err(&dev->v4l2_dev,
+			 "no capture port - stream not started?\n");
+		return;
+	}
 
 	v4l2_dbg(1, bcm2835_v4l2_debug, &dev->v4l2_dev, "stopping capturing\n");
 
@@ -599,12 +602,8 @@ static int stop_streaming(struct vb2_queue *vq)
 			 ret);
 	}
 
-	if (disable_camera(dev) < 0) {
-		v4l2_err(&dev->v4l2_dev, "Failed to disable camera");
-		return -EINVAL;
-	}
-
-	return ret;
+	if (disable_camera(dev) < 0)
+		v4l2_err(&dev->v4l2_dev, "Failed to disable camera\n");
 }
 
 static void bm2835_mmal_lock(struct vb2_queue *vq)
