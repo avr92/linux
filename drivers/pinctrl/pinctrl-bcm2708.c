@@ -577,16 +577,6 @@ static int bcm2708_pmx_enable(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
-static void bcm2708_pmx_disable(struct pinctrl_dev *pctldev,
-		unsigned func_selector,
-		unsigned group_selector)
-{
-	struct bcm2708_pinctrl *pc = pinctrl_dev_get_drvdata(pctldev);
-
-	/* disable by setting to GPIO_IN */
-	bcm2708_pinctrl_fsel_set(pc, group_selector, BCM2708_FSEL_GPIO_IN);
-}
-
 static void bcm2708_pmx_gpio_disable_free(struct pinctrl_dev *pctldev,
 		struct pinctrl_gpio_range *range,
 		unsigned offset)
@@ -616,7 +606,6 @@ static const struct pinmux_ops bcm2708_pmx_ops = {
 	.get_function_name = bcm2708_pmx_get_function_name,
 	.get_function_groups = bcm2708_pmx_get_function_groups,
 	.enable = bcm2708_pmx_enable,
-	.disable = bcm2708_pmx_disable,
 	.gpio_disable_free = bcm2708_pmx_gpio_disable_free,
 	.gpio_set_direction = bcm2708_pmx_gpio_set_direction,
 };
