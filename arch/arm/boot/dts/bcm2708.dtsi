@@ -8,7 +8,7 @@
 
 	chosen {
 		/* No padding required - the boot loader can do that. */
-		bootargs = "console=ttyAMA0";
+		bootargs = "";
 	};
 
 	soc {
