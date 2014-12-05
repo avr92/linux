@@ -917,9 +917,12 @@ int __init early_init_dt_scan_chosen(unsigned long node, const char *uname,
 
 	if (p != NULL && l > 0)	{
 #if defined(CONFIG_CMDLINE_EXTEND)
-		if (((char *)data)[0])
+		int len = strlen(data);
+		if (len > 0) {
 			strlcat(data, " ", COMMAND_LINE_SIZE);
-		strlcat(data, p, min((int)l, COMMAND_LINE_SIZE));
+			len++;
+		}
+		strlcpy((char *)data + len, p, min((int)l, COMMAND_LINE_SIZE - len));
 #elif defined(CONFIG_CMDLINE_FORCE)
 		pr_warning("Ignoring bootargs property (using the default kernel command line)\n");
 #else
